@@ -15,16 +15,19 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*', 'up'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
+        'http://localhost:5173',
         'http://localhost:8080', 
         'http://localhost:3000', 
         'http://127.0.0.1:8080',
         'http://localhost:8081',
-        'http://127.0.0.1:8081'
+        'http://127.0.0.1:8081',
+        // Production frontend - À remplacer par votre URL Render réelle
+        // 'https://sikagreen-frontend.onrender.com',
     ],
 
     'allowed_origins_patterns' => [],

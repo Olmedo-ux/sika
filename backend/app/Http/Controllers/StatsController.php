@@ -17,7 +17,7 @@ class StatsController extends Controller
     {
         // Calculate total waste recycled (sum of all completed collections)
         $totalWasteRecycled = Collection::where('status', 'completed')
-            ->sum(DB::raw('CAST(REGEXP_REPLACE(quantity, "[^0-9.]", "") AS DECIMAL(10,2))'));
+            ->sum(DB::raw("CAST(REGEXP_REPLACE(quantity, '[^0-9.]', '', 'g') AS DECIMAL(10,2))"));
 
         // Estimate CO2 avoided (rough calculation: 1kg waste = ~0.5kg CO2)
         $co2Avoided = $totalWasteRecycled * 0.5;
@@ -57,7 +57,7 @@ class StatsController extends Controller
 
             $totalWeight = Collection::where('citizen_id', $user->id)
                 ->where('status', 'completed')
-                ->sum(DB::raw('CAST(REGEXP_REPLACE(quantity, "[^0-9.]", "") AS DECIMAL(10,2))'));
+                ->sum(DB::raw("CAST(REGEXP_REPLACE(quantity, '[^0-9.]', '', 'g') AS DECIMAL(10,2))"));
 
             $stats['totalWeight'] = round($totalWeight, 2);
 
@@ -78,7 +78,7 @@ class StatsController extends Controller
 
             $totalWeight = Collection::where('collector_id', $user->id)
                 ->where('status', 'completed')
-                ->sum(DB::raw('CAST(REGEXP_REPLACE(quantity, "[^0-9.]", "") AS DECIMAL(10,2))'));
+                ->sum(DB::raw("CAST(REGEXP_REPLACE(quantity, '[^0-9.]', '', 'g') AS DECIMAL(10,2))"));
 
             $stats['totalWeight'] = round($totalWeight, 2);
 
