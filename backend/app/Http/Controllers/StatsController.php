@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Collection;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class StatsController extends Controller
+{
+    /**
+     * Get global statistics for landing page
+     */
+    public function global()
+    {
+        // Calculate total waste recycled (sum of all completed collections)
+        $totalWasteRecycled = Collection::where('status', 'completed')
+            ->sum(DB::raw('CAST(REGEXP_REPLACE(quantity, "[^0-9.]", "") AS DECIMAL(10,2))'));
+
+        // Estimate CO2 avoided (rough calculation: 1kg waste = ~0.5kg CO2)
+        $co2Avoided = $totalWasteRecycled * 0.5;
+
+        // Count families engaged (citizens)
+        $familiesEngaged = User::where('role', 'citizen')->count();
+
+        // Count active collectors
+        $activeCollectors = User::where('role', 'collector')->count();
+
+        return response()->json([
+            'totalWasteRecycled' => round($totalWasteRecycled, 0),
+            'co2Avoided' => round($co2Avoided, 0),
+            'familiesEngaged' => $familiesEngaged,
+            'activeCollectors' => $activeCollectors,
+        ]);
+    }
+
+    /**
+     * Get dashboard statistics for authenticated user
+     */
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $stats = [];
+
+        if ($user->role === 'citizen') {
+            // Citizen stats
+            $stats['pendingCollections'] = Collection::where('citizen_id', $user->id)
+                ->whereIn('status', ['pending', 'accepted', 'in_progress'])
+                ->count();
+
+            $stats['completedThisMonth'] = Collection::where('citizen_id', $user->id)
+                ->where('status', 'completed')
+                ->whereMonth('completed_at', now()->month)
+                ->count();
+
+            $totalWeight = Collection::where('citizen_id', $user->id)
+                ->where('status', 'completed')
+                ->sum(DB::raw('CAST(REGEXP_REPLACE(quantity, "[^0-9.]", "") AS DECIMAL(10,2))'));
+
+            $stats['totalWeight'] = round($totalWeight, 2);
+
+            $stats['totalEarnings'] = Collection::where('citizen_id', $user->id)
+                ->where('status', 'completed')
+                ->sum('amount') ?? 0;
+
+        } elseif ($user->role === 'collector') {
+            // Collector stats
+            $stats['pendingCollections'] = Collection::where('collector_id', $user->id)
+                ->whereIn('status', ['accepted', 'in_progress'])
+                ->count();
+
+            $stats['completedThisMonth'] = Collection::where('collector_id', $user->id)
+                ->where('status', 'completed')
+                ->whereMonth('completed_at', now()->month)
+                ->count();
+
+            $totalWeight = Collection::where('collector_id', $user->id)
+                ->where('status', 'completed')
+                ->sum(DB::raw('CAST(REGEXP_REPLACE(quantity, "[^0-9.]", "") AS DECIMAL(10,2))'));
+
+            $stats['totalWeight'] = round($totalWeight, 2);
+
+            $stats['totalEarnings'] = 0; // Collectors don't earn from collections directly
+
+        } elseif ($user->role === 'recycler') {
+            // Recycler stats
+            // TODO: Implement actual sales tracking via transactions/orders table
+            // For now, sales are 0 until a transaction system is implemented
+            $stats['totalSales'] = 0; // Will be count of completed marketplace transactions
+            $stats['totalRevenue'] = 0; // Will be sum of completed transaction amounts
+
+            $stats['activeProducts'] = \App\Models\MarketplaceProduct::where('seller_id', $user->id)
+                ->where('available', true)
+                ->count();
+
+            $stats['totalProducts'] = \App\Models\MarketplaceProduct::where('seller_id', $user->id)
+                ->count();
+        }
+
+        return response()->json($stats);
+    }
+}
