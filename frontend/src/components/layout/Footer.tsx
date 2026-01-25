@@ -30,7 +30,7 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-2 text-sm text-foreground">Contact</h4>
             <ul className="space-y-1.5">
-              <li className="flex items-start gap-2"><MapPin className="h-3 w-3 text-primary shrink-0 mt-0.5" /><span className="text-xs text-muted-foreground">Lomé, Togo</span></li>
+              <li className="flex items-center gap-2"><MapPin className="h-3 w-3 text-primary shrink-0" /><span className="text-xs text-muted-foreground">Lomé, Togo</span></li>
               <li className="flex items-center gap-2"><Phone className="h-3 w-3 text-primary shrink-0" /><a href="tel:+22879859416" className="text-xs text-muted-foreground hover:text-primary transition-colors">+228 79 85 94 16</a></li>
               <li className="flex items-center gap-2"><Mail className="h-3 w-3 text-primary shrink-0" /><a href="mailto:contact@sikagreen.tg" className="text-xs text-muted-foreground hover:text-primary transition-colors">contact@sikagreen.tg</a></li>
             </ul>
