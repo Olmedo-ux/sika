@@ -16,8 +16,22 @@ class StatsController extends Controller
     public function global()
     {
         // Calculate total waste recycled (sum of all completed collections)
-        $totalWasteRecycled = Collection::where('status', 'completed')
-            ->sum(DB::raw("CAST(REGEXP_REPLACE(quantity, '[^0-9.]', '', 'g') AS DECIMAL(10,2))"));
+        // For now, return 0 if no data to avoid SQL errors
+        $completedCollections = Collection::where('status', 'completed')->count();
+        $totalWasteRecycled = 0;
+        
+        if ($completedCollections > 0) {
+            // Try to sum quantity, fallback to 0 on error
+            try {
+                $totalWasteRecycled = Collection::where('status', 'completed')
+                    ->get()
+                    ->sum(function($collection) {
+                        return floatval(preg_replace('/[^0-9.]/', '', $collection->quantity ?? '0'));
+                    });
+            } catch (\Exception $e) {
+                $totalWasteRecycled = 0;
+            }
+        }
 
         // Estimate CO2 avoided (rough calculation: 1kg waste = ~0.5kg CO2)
         $co2Avoided = $totalWasteRecycled * 0.5;
@@ -55,9 +69,17 @@ class StatsController extends Controller
                 ->whereMonth('completed_at', now()->month)
                 ->count();
 
-            $totalWeight = Collection::where('citizen_id', $user->id)
-                ->where('status', 'completed')
-                ->sum(DB::raw("CAST(REGEXP_REPLACE(quantity, '[^0-9.]', '', 'g') AS DECIMAL(10,2))"));
+            $totalWeight = 0;
+            try {
+                $totalWeight = Collection::where('citizen_id', $user->id)
+                    ->where('status', 'completed')
+                    ->get()
+                    ->sum(function($collection) {
+                        return floatval(preg_replace('/[^0-9.]/', '', $collection->quantity ?? '0'));
+                    });
+            } catch (\Exception $e) {
+                $totalWeight = 0;
+            }
 
             $stats['totalWeight'] = round($totalWeight, 2);
 
@@ -76,9 +98,17 @@ class StatsController extends Controller
                 ->whereMonth('completed_at', now()->month)
                 ->count();
 
-            $totalWeight = Collection::where('collector_id', $user->id)
-                ->where('status', 'completed')
-                ->sum(DB::raw("CAST(REGEXP_REPLACE(quantity, '[^0-9.]', '', 'g') AS DECIMAL(10,2))"));
+            $totalWeight = 0;
+            try {
+                $totalWeight = Collection::where('collector_id', $user->id)
+                    ->where('status', 'completed')
+                    ->get()
+                    ->sum(function($collection) {
+                        return floatval(preg_replace('/[^0-9.]/', '', $collection->quantity ?? '0'));
+                    });
+            } catch (\Exception $e) {
+                $totalWeight = 0;
+            }
 
             $stats['totalWeight'] = round($totalWeight, 2);
 
