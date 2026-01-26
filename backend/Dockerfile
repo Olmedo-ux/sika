@@ -24,16 +24,14 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Cache Laravel configuration
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
-
 # Create storage link
 RUN php artisan storage:link || true
 
 # Expose port
 EXPOSE 8080
 
-# Start command
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
+# Start command - Clear cache, run migrations, then serve
+CMD php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=8080
