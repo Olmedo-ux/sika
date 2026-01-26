@@ -6,26 +6,27 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { lazy, Suspense } from "react";
 
-// Pages
-import Landing from "@/pages/Landing";
-import Auth from "@/pages/Auth";
-import Marketplace from "@/pages/Marketplace";
-import ProductDetail from "@/pages/ProductDetail";
-import CitizenDashboard from "@/pages/dashboard/CitizenDashboard";
-import CollectorDashboard from "@/pages/dashboard/CollectorDashboard";
-import RecyclerDashboard from "@/pages/dashboard/RecyclerDashboard";
-import NewCollection from "@/pages/dashboard/NewCollection";
-import CitizenHistory from "@/pages/dashboard/CitizenHistory";
-import CitizenRecyclersMap from "@/pages/dashboard/CitizenRecyclersMap";
-import CollectorMap from "@/pages/dashboard/CollectorMap";
-import CollectorHistory from "@/pages/dashboard/CollectorHistory";
-import RecyclerMarketplace from "@/pages/dashboard/RecyclerMarketplace";
-import RecyclerOrders from "@/pages/dashboard/RecyclerOrders";
-import Chat from "@/pages/Chat";
-import Profile from "@/pages/Profile";
-import Legal from "@/pages/Legal";
-import NotFound from "@/pages/NotFound";
+// Lazy load pages for better performance
+const Landing = lazy(() => import("@/pages/Landing"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const Marketplace = lazy(() => import("@/pages/Marketplace"));
+const ProductDetail = lazy(() => import("@/pages/ProductDetail"));
+const CitizenDashboard = lazy(() => import("@/pages/dashboard/CitizenDashboard"));
+const CollectorDashboard = lazy(() => import("@/pages/dashboard/CollectorDashboard"));
+const RecyclerDashboard = lazy(() => import("@/pages/dashboard/RecyclerDashboard"));
+const NewCollection = lazy(() => import("@/pages/dashboard/NewCollection"));
+const CitizenHistory = lazy(() => import("@/pages/dashboard/CitizenHistory"));
+const CitizenRecyclersMap = lazy(() => import("@/pages/dashboard/CitizenRecyclersMap"));
+const CollectorMap = lazy(() => import("@/pages/dashboard/CollectorMap"));
+const CollectorHistory = lazy(() => import("@/pages/dashboard/CollectorHistory"));
+const RecyclerMarketplace = lazy(() => import("@/pages/dashboard/RecyclerMarketplace"));
+const RecyclerOrders = lazy(() => import("@/pages/dashboard/RecyclerOrders"));
+const Chat = lazy(() => import("@/pages/Chat"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const Legal = lazy(() => import("@/pages/Legal"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -37,7 +38,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <Routes>
               {/* Routes with MainLayout (Header + Footer) */}
               <Route element={<MainLayout />}>
                 {/* Public Routes */}
@@ -72,7 +74,8 @@ const App = () => (
               
               {/* 404 */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
