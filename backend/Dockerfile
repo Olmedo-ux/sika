@@ -27,10 +27,12 @@ RUN composer install --no-dev --optimize-autoloader
 # Create storage link
 RUN php artisan storage:link || true
 
+# Copy and make start script executable
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 # Expose port
 EXPOSE 8080
 
-# Start command - Clear config, run migrations, then serve
-CMD php artisan config:clear && \
-    php artisan migrate --force && \
-    php artisan serve --host=0.0.0.0 --port=8080
+# Start command
+CMD ["/start.sh"]
