@@ -346,15 +346,15 @@ export default function Auth() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-2">
+                  <div className="flex items-start space-x-3">
                     <input
                       type="checkbox"
                       id="terms-login"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      className="mt-0.5 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
                     />
-                    <label htmlFor="terms-login" className="text-xs text-muted-foreground">
+                    <label htmlFor="terms-login" className="text-sm text-muted-foreground cursor-pointer">
                       J'accepte les{' '}
                       <Link to="/legal" className="text-primary hover:underline" target="_blank">
                         conditions générales d'utilisation
@@ -570,15 +570,15 @@ export default function Auth() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-2">
+                  <div className="flex items-start space-x-3">
                     <input
                       type="checkbox"
                       id="terms-register"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      className="mt-0.5 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
                     />
-                    <label htmlFor="terms-register" className="text-xs text-muted-foreground">
+                    <label htmlFor="terms-register" className="text-sm text-muted-foreground cursor-pointer">
                       J'accepte les{' '}
                       <Link to="/legal" className="text-primary hover:underline" target="_blank">
                         conditions générales d'utilisation
