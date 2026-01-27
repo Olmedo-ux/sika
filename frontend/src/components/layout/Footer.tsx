@@ -29,10 +29,10 @@ export function Footer() {
           </div>
           <div>
             <h4 className="font-semibold mb-2 text-sm text-foreground">Contact</h4>
-            <ul className="space-y-1.5">
-              <li className="flex items-center gap-2"><MapPin className="h-3 w-3 text-primary shrink-0" /><span className="text-xs text-muted-foreground">Lomé, Togo</span></li>
-              <li className="flex items-center gap-2"><Phone className="h-3 w-3 text-primary shrink-0" /><a href="tel:+22879859416" className="text-xs text-muted-foreground hover:text-primary transition-colors">+228 79 85 94 16</a></li>
-              <li className="flex items-center gap-2"><Mail className="h-3 w-3 text-primary shrink-0" /><a href="mailto:contact@sikagreen.tg" className="text-xs text-muted-foreground hover:text-primary transition-colors">contact@sikagreen.tg</a></li>
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span className="text-xs text-muted-foreground leading-relaxed">Lomé, Togo</span></li>
+              <li className="flex items-start gap-2"><Phone className="h-4 w-4 text-primary shrink-0 mt-0.5" /><a href="tel:+22879859416" className="text-xs text-muted-foreground hover:text-primary transition-colors leading-relaxed">+228 79 85 94 16</a></li>
+              <li className="flex items-start gap-2"><Mail className="h-4 w-4 text-primary shrink-0 mt-0.5" /><a href="mailto:contact@sikagreen.tg" className="text-xs text-muted-foreground hover:text-primary transition-colors leading-relaxed">contact@sikagreen.tg</a></li>
             </ul>
           </div>
         </div>
