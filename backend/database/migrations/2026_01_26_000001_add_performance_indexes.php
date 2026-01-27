@@ -14,7 +14,7 @@ return new class extends Migration
         // Add indexes to users table for frequently queried fields
         Schema::table('users', function (Blueprint $table) {
             $table->index('role');
-            $table->index('email');
+            $table->index('phone');
         });
 
         // Add indexes to collections table for performance
@@ -62,7 +62,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropIndex(['role']);
-            $table->dropIndex(['email']);
+            $table->dropIndex(['phone']);
         });
 
         Schema::table('collections', function (Blueprint $table) {
