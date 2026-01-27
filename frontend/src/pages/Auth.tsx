@@ -346,17 +346,17 @@ export default function Auth() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3">
+                  <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       id="terms-login"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-0.5 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                      className="h-6 w-6 min-w-[24px] rounded border-2 border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
                     />
-                    <label htmlFor="terms-login" className="text-sm text-muted-foreground cursor-pointer">
+                    <label htmlFor="terms-login" className="text-sm leading-tight text-muted-foreground cursor-pointer">
                       J'accepte les{' '}
-                      <Link to="/legal" className="text-primary hover:underline" target="_blank">
+                      <Link to="/legal" className="text-primary hover:underline font-medium" target="_blank">
                         conditions générales d'utilisation
                       </Link>
                     </label>
@@ -570,17 +570,17 @@ export default function Auth() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3">
+                  <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       id="terms-register"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-0.5 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                      className="h-6 w-6 min-w-[24px] rounded border-2 border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
                     />
-                    <label htmlFor="terms-register" className="text-sm text-muted-foreground cursor-pointer">
+                    <label htmlFor="terms-register" className="text-sm leading-tight text-muted-foreground cursor-pointer">
                       J'accepte les{' '}
-                      <Link to="/legal" className="text-primary hover:underline" target="_blank">
+                      <Link to="/legal" className="text-primary hover:underline font-medium" target="_blank">
                         conditions générales d'utilisation
                       </Link>
                     </label>
