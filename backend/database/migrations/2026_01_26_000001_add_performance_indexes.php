@@ -36,8 +36,8 @@ return new class extends Migration
 
         // Add indexes to reviews table
         Schema::table('reviews', function (Blueprint $table) {
-            $table->index('reviewer_id');
-            $table->index('reviewed_id');
+            $table->index('from_user_id');
+            $table->index('to_user_id');
         });
 
         // Add indexes to chat_messages table
@@ -81,8 +81,8 @@ return new class extends Migration
         });
 
         Schema::table('reviews', function (Blueprint $table) {
-            $table->dropIndex(['reviewer_id']);
-            $table->dropIndex(['reviewed_id']);
+            $table->dropIndex(['from_user_id']);
+            $table->dropIndex(['to_user_id']);
         });
 
         Schema::table('chat_messages', function (Blueprint $table) {
