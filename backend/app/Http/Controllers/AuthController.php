@@ -16,17 +16,17 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'phone' => 'required|string|unique:users,phone',
-            'password' => 'required|string|min:6',
-            'name' => 'required|string|max:255',
-            'role' => 'required|in:citizen,collector,recycler',
-            'neighborhood' => 'required|string|max:255',
-            'company_name' => 'nullable|string|max:255',
-            'responsible_name' => 'nullable|string|max:255',
-        ]);
-
         try {
+            $validated = $request->validate([
+                'phone' => 'required|string|unique:users,phone',
+                'password' => 'required|string|min:6',
+                'name' => 'required|string|max:255',
+                'role' => 'required|in:citizen,collector,recycler',
+                'neighborhood' => 'required|string|max:255',
+                'company_name' => 'nullable|string|max:255',
+                'responsible_name' => 'nullable|string|max:255',
+            ]);
+
             $user = User::create([
                 'phone' => $validated['phone'],
                 'password' => Hash::make($validated['password']),
@@ -45,11 +45,13 @@ class AuthController extends Controller
                 'user' => new \App\Http\Resources\UserResource($user),
                 'token' => $token,
             ], 201);
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('Register failed', [
                 'error' => $e->getMessage(),
-                'phone' => $validated['phone'] ?? null,
-                'role' => $validated['role'] ?? null,
+                'phone' => $request->input('phone'),
+                'role' => $request->input('role'),
             ]);
 
             return response()->json([
@@ -60,18 +62,18 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $validated = $request->validate([
-            'phone' => 'required|string',
-            'password' => 'required|string',
-        ]);
-
-        if (!Auth::attempt(['phone' => $validated['phone'], 'password' => $validated['password']])) {
-            throw ValidationException::withMessages([
-                'phone' => ['Les informations d\'identification fournies sont incorrectes.'],
-            ]);
-        }
-
         try {
+            $validated = $request->validate([
+                'phone' => 'required|string',
+                'password' => 'required|string',
+            ]);
+
+            if (!Auth::attempt(['phone' => $validated['phone'], 'password' => $validated['password']])) {
+                throw ValidationException::withMessages([
+                    'phone' => ['Les informations d\'identification fournies sont incorrectes.'],
+                ]);
+            }
+
             $user = Auth::user();
             $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -79,10 +81,12 @@ class AuthController extends Controller
                 'user' => new \App\Http\Resources\UserResource($user),
                 'token' => $token,
             ]);
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('Login failed', [
                 'error' => $e->getMessage(),
-                'phone' => $validated['phone'] ?? null,
+                'phone' => $request->input('phone'),
             ]);
 
             return response()->json([

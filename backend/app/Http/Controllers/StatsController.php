@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class StatsController extends Controller
 {
@@ -16,44 +17,57 @@ class StatsController extends Controller
      */
     public function global()
     {
-        // Cache global stats for 5 minutes to reduce database load
-        $data = Cache::remember('global_stats', 300, function () {
-            // Calculate total waste recycled (sum of all completed collections)
-            // For now, return 0 if no data to avoid SQL errors
-            $completedCollections = Collection::where('status', 'completed')->count();
-            $totalWasteRecycled = 0;
-            
-            if ($completedCollections > 0) {
-                // Try to sum quantity, fallback to 0 on error
-                try {
-                    $totalWasteRecycled = Collection::where('status', 'completed')
-                        ->get()
-                        ->sum(function($collection) {
-                            return floatval(preg_replace('/[^0-9.]/', '', $collection->quantity ?? '0'));
-                        });
-                } catch (\Exception $e) {
-                    $totalWasteRecycled = 0;
+        try {
+            // Cache global stats for 5 minutes to reduce database load
+            $data = Cache::remember('global_stats', 300, function () {
+                // Calculate total waste recycled (sum of all completed collections)
+                // For now, return 0 if no data to avoid SQL errors
+                $completedCollections = Collection::where('status', 'completed')->count();
+                $totalWasteRecycled = 0;
+
+                if ($completedCollections > 0) {
+                    // Try to sum quantity, fallback to 0 on error
+                    try {
+                        $totalWasteRecycled = Collection::where('status', 'completed')
+                            ->get()
+                            ->sum(function ($collection) {
+                                return floatval(preg_replace('/[^0-9.]/', '', $collection->quantity ?? '0'));
+                            });
+                    } catch (\Exception $e) {
+                        $totalWasteRecycled = 0;
+                    }
                 }
-            }
 
-            // Estimate CO2 avoided (rough calculation: 1kg waste = ~0.5kg CO2)
-            $co2Avoided = $totalWasteRecycled * 0.5;
+                // Estimate CO2 avoided (rough calculation: 1kg waste = ~0.5kg CO2)
+                $co2Avoided = $totalWasteRecycled * 0.5;
 
-            // Count families engaged (citizens)
-            $familiesEngaged = User::where('role', 'citizen')->count();
+                // Count families engaged (citizens)
+                $familiesEngaged = User::where('role', 'citizen')->count();
 
-            // Count active collectors
-            $activeCollectors = User::where('role', 'collector')->count();
+                // Count active collectors
+                $activeCollectors = User::where('role', 'collector')->count();
 
-            return [
-                'totalWasteRecycled' => round($totalWasteRecycled, 0),
-                'co2Avoided' => round($co2Avoided, 0),
-                'familiesEngaged' => $familiesEngaged,
-                'activeCollectors' => $activeCollectors,
-            ];
-        });
+                return [
+                    'totalWasteRecycled' => round($totalWasteRecycled, 0),
+                    'co2Avoided' => round($co2Avoided, 0),
+                    'familiesEngaged' => $familiesEngaged,
+                    'activeCollectors' => $activeCollectors,
+                ];
+            });
 
-        return response()->json($data);
+            return response()->json($data);
+        } catch (\Throwable $e) {
+            Log::error('Stats global failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'totalWasteRecycled' => 0,
+                'co2Avoided' => 0,
+                'familiesEngaged' => 0,
+                'activeCollectors' => 0,
+            ]);
+        }
     }
 
     /**
