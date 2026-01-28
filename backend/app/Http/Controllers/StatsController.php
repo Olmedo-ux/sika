@@ -17,7 +17,7 @@ class StatsController extends Controller
     public function global()
     {
         // Cache global stats for 5 minutes to reduce database load
-        return Cache::remember('global_stats', 300, function () {
+        $data = Cache::remember('global_stats', 300, function () {
             // Calculate total waste recycled (sum of all completed collections)
             // For now, return 0 if no data to avoid SQL errors
             $completedCollections = Collection::where('status', 'completed')->count();
@@ -45,13 +45,15 @@ class StatsController extends Controller
             // Count active collectors
             $activeCollectors = User::where('role', 'collector')->count();
 
-            return response()->json([
+            return [
                 'totalWasteRecycled' => round($totalWasteRecycled, 0),
                 'co2Avoided' => round($co2Avoided, 0),
                 'familiesEngaged' => $familiesEngaged,
                 'activeCollectors' => $activeCollectors,
-            ]);
+            ];
         });
+
+        return response()->json($data);
     }
 
     /**

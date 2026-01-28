@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -25,24 +26,36 @@ class AuthController extends Controller
             'responsible_name' => 'nullable|string|max:255',
         ]);
 
-        $user = User::create([
-            'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
-            'name' => $validated['name'],
-            'role' => $validated['role'],
-            'neighborhood' => $validated['neighborhood'],
-            'company_name' => $validated['company_name'] ?? null,
-            'responsible_name' => $validated['responsible_name'] ?? null,
-            'wallet' => 0,
-            'review_count' => 0,
-        ]);
+        try {
+            $user = User::create([
+                'phone' => $validated['phone'],
+                'password' => Hash::make($validated['password']),
+                'name' => $validated['name'],
+                'role' => $validated['role'],
+                'neighborhood' => $validated['neighborhood'],
+                'company_name' => $validated['company_name'] ?? null,
+                'responsible_name' => $validated['responsible_name'] ?? null,
+                'wallet' => 0,
+                'review_count' => 0,
+            ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+            $token = $user->createToken('auth-token')->plainTextToken;
 
-        return response()->json([
-            'user' => new \App\Http\Resources\UserResource($user),
-            'token' => $token,
-        ], 201);
+            return response()->json([
+                'user' => new \App\Http\Resources\UserResource($user),
+                'token' => $token,
+            ], 201);
+        } catch (\Throwable $e) {
+            Log::error('Register failed', [
+                'error' => $e->getMessage(),
+                'phone' => $validated['phone'] ?? null,
+                'role' => $validated['role'] ?? null,
+            ]);
+
+            return response()->json([
+                'message' => 'Internal Server Error',
+            ], 500);
+        }
     }
 
     public function login(Request $request)
@@ -58,13 +71,24 @@ class AuthController extends Controller
             ]);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('auth-token')->plainTextToken;
+        try {
+            $user = Auth::user();
+            $token = $user->createToken('auth-token')->plainTextToken;
 
-        return response()->json([
-            'user' => new \App\Http\Resources\UserResource($user),
-            'token' => $token,
-        ]);
+            return response()->json([
+                'user' => new \App\Http\Resources\UserResource($user),
+                'token' => $token,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Login failed', [
+                'error' => $e->getMessage(),
+                'phone' => $validated['phone'] ?? null,
+            ]);
+
+            return response()->json([
+                'message' => 'Internal Server Error',
+            ], 500);
+        }
     }
 
     public function logout(Request $request)
